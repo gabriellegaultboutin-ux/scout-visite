@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#24543F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Scout visite">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Scout visite</title>
+<style>
+:root{--bg:#EDF1E7;--surface:#FBFCF7;--ink:#1B2A21;--muted:#53655A;--line:#CCD8C6;--pine:#24543F;--warn:#E8772E;--bad:#C2185B;--ok:#2E7D32;--blue:#1E6BB8;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--bg:#0D1611;--surface:#152219;--ink:#E6EEE5;--muted:#9DB0A3;--line:#2B3D31;--pine:#7FC29B;color-scheme:dark}}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+header{position:sticky;top:0;z-index:5;background:#24543F;color:#fff;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;align-items:center;gap:10px}
+header h1{font-size:18px;line-height:1.2;margin:0;flex:1}header small{display:block;font-size:12.5px;font-weight:500;opacity:.85}
+header button,header a{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.7);border-radius:10px;min-height:40px;padding:0 12px;font:700 14px inherit;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center}
+main{max-width:720px;margin:0 auto;padding:12px 12px calc(96px + env(safe-area-inset-bottom));display:grid;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:10px}
+.card h2{margin:0;font-size:16px}
+.fine{font-size:13px;color:var(--muted);margin:0}
+.btn{min-height:46px;border-radius:12px;border:1.5px solid var(--pine);background:var(--surface);color:var(--pine);font:700 15px inherit;font-family:inherit;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.btn.main{background:var(--pine);color:var(--surface)}
+.btn.rec{background:var(--bad);border-color:var(--bad);color:#fff}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1 1 140px}
+.list{display:grid;gap:8px}
+.lot{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:left;font:inherit;color:inherit;width:100%}
+.lot b{display:block;font-size:15px}.lot small{color:var(--muted);font-size:13px}
+.no{display:inline-grid;place-items:center;min-width:42px;height:32px;border-radius:8px;background:var(--pine);color:var(--surface);font-weight:800;font-size:14px}
+.dist{font-weight:700;font-size:14px;color:var(--pine);white-space:nowrap}
+.tag{font-size:12px;font-weight:700;color:var(--ok)}
+.map{position:relative;border-radius:12px;overflow:hidden;background:#222;touch-action:pan-y}
+.map img{display:block;width:100%;height:auto}.map svg{position:absolute;inset:0;width:100%;height:100%}
+.where{font-weight:700;font-size:15px}.where.in{color:var(--ok)}.where.out{color:var(--warn)}
+.meter{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
+.meter div{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px 4px}.meter b{display:block;font-size:30px;line-height:1.1;font-variant-numeric:tabular-nums}.meter span{font-size:12px;color:var(--muted)}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--pine);transition:width .1s}
+.it{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}.it:first-child{border-top:0}
+.it p{margin:0;font-size:15px}.it small{display:block;color:var(--muted);font-size:13px}
+.tri{display:flex;gap:4px}.tri button,.bars button,.chips button{min-height:42px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font:700 15px inherit;font-family:inherit;color:var(--muted)}
+.tri button{min-width:44px}
+.tri button[aria-pressed=true][data-v=ok]{background:var(--ok);color:#fff;border-color:var(--ok)}.tri button[aria-pressed=true][data-v=w]{background:var(--warn);color:#fff;border-color:var(--warn)}.tri button[aria-pressed=true][data-v=x]{background:var(--bad);color:#fff;border-color:var(--bad)}
+.sig{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:center}.bars{display:flex;gap:4px}.bars button{width:42px}
+.bars button[aria-pressed=true],.chips button[aria-pressed=true]{background:var(--pine);color:var(--surface);border-color:var(--pine)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chips button{padding:0 12px;border-radius:999px;font-weight:600;color:var(--ink)}
+textarea,input[type=text],input[type=number]{width:100%;font:16px inherit;font-family:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+textarea{min-height:110px}
+.ph{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}.ph figure{margin:0;position:relative}.ph img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;display:block}
+.ph figcaption{font-size:11.5px;color:var(--muted)}.ph button{position:absolute;top:4px;right:4px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff}
+.add{position:relative;display:flex;align-items:center;justify-content:center;min-height:52px;border-radius:12px;border:2px dashed var(--pine);color:var(--pine);font-weight:700}
+.add input{position:absolute;inset:0;opacity:0}
+.foot{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);padding:8px 12px calc(8px + env(safe-area-inset-bottom));display:flex;gap:8px;align-items:center}
+.foot .st{flex:1;font-size:13px;color:var(--muted)}
+.marks{display:grid;gap:4px}.marks div{display:flex;justify-content:space-between;gap:8px;font-size:14px;border-top:1px solid var(--line);padding-top:4px}
+dialog{border:0;border-radius:16px;padding:16px;max-width:420px;width:calc(100% - 32px);background:var(--surface);color:var(--ink)}dialog::backdrop{background:rgba(0,0,0,.45)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header><h1 id="ttl">Scout visite<small id="sub">Terrains de Projet Scout</small></h1><button id="back" hidden>Liste</button></header>
+<main id="main"></main>
+<div class="foot" id="foot"><span class="st" id="st">Chargement…</span></div>
+<dialog id="dlg"></dialog>
+<script>
+{
+const PS="https://claude.ai/artifact/GUzGrUXZhvdQSc9uop8L6P";
+const $=s=>document.querySelector(s), M=$("#main");
+const esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let LOTS=[], cur=null, V=null, pos=null, watch=null, trace=false, meter=null, CAL=null;
+try{CAL=JSON.parse(localStorage.getItem("sv-cal")||"null");}catch(_){}
+const st=t=>{$("#st").textContent=t;};
+// ---------- IndexedDB ----------
+const idb=new Promise((res,rej)=>{const r=indexedDB.open("scout-visite",1); r.onupgradeneeded=()=>{r.result.createObjectStore("v"); r.result.createObjectStore("p");}; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);});
+const tx=async(s,m,f)=>{const d=await idb; return new Promise((res,rej)=>{const t=d.transaction(s,m), o=t.objectStore(s), r=f(o); t.oncomplete=()=>res(r&&r.result); t.onerror=()=>rej(t.error);});};
+const getV=id=>tx("v","readonly",o=>o.get(id)), putV=v=>tx("v","readwrite",o=>o.put(v,v.lot));
+const allPh=async lot=>{const d=await idb; return new Promise(res=>{const out=[]; const c=d.transaction("p").objectStore("p").openCursor(); c.onsuccess=()=>{const x=c.result; if(!x){res(out);return;} if(x.value.lot===lot) out.push({k:x.key,...x.value}); x.continue();};});};
+const putPh=(k,p)=>tx("p","readwrite",o=>o.put(p,k)), delPh=k=>tx("p","readwrite",o=>o.delete(k));
+// ---------- géo ----------
+const R2D=180/Math.PI, E=20037508.342789244;
+const merc=(lat,lng)=>[lng*E/180, Math.log(Math.tan((90+lat)*Math.PI/360))*R2D*E/180];
+const px=(l,lat,lng)=>{const [x,y]=merc(lat,lng), b=l.bb; return [(x-b[0])/(b[2]-b[0])*1000,(b[3]-y)/(b[3]-b[1])*1000];};
+const dist=(a,b,c,d)=>{const R=6371000,f=x=>x*Math.PI/180; const h=Math.sin(f(c-a)/2)**2+Math.cos(f(a))*Math.cos(f(c))*Math.sin(f(d-b)/2)**2; return 2*R*Math.asin(Math.sqrt(h));};
+const dirTo=(a,b,c,d)=>["nord","nord-est","est","sud-est","sud","sud-ouest","ouest","nord-ouest"][Math.round(((Math.atan2((d-b)*Math.cos(a*Math.PI/180),c-a)*R2D)+360)%360/45)%8];
+const inside=(lat,lng,poly)=>{let c=false; for(let i=0,j=poly.length-1;i<poly.length;j=i++){const [ya,xa]=poly[i],[yb,xb]=poly[j]; if(((ya>lat)!==(yb>lat))&&(lng<(xb-xa)*(lat-ya)/(yb-ya)+xa)) c=!c;} return c;};
+function startGeo(){ if(watch!=null||!navigator.geolocation) return; watch=navigator.geolocation.watchPosition(p=>{pos={lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy,t:Date.now()}; onPos();},e=>{st(e.code===1?"GPS refusé : autorisez la localisation pour Safari (Réglages › Confidentialité › Service de localisation).":"GPS indisponible pour l’instant.");},{enableHighAccuracy:true,maximumAge:3000,timeout:20000});}
+function onPos(){ if(!cur){ list(); return; } if(trace&&V&&pos.acc<35){const t=V.trace||(V.trace=[]); const l=t[t.length-1]; if(!l||dist(l[0],l[1],pos.lat,pos.lng)>4){t.push([+pos.lat.toFixed(6),+pos.lng.toFixed(6)]); save();}} drawMap(); }
+// ---------- données ----------
+const CARR=["Bell","Rogers","Telus","Vidéotron"], HEAR=["Route","Autoroute","Moteurs, motoneiges","Voisins","Chiens","Chantier","Ruisseau","Rien du tout"];
+const MK=[["maison","Emplacement de maison"],["roc","Roc visible"],["eau","Zone mouillée"],["borne","Borne trouvée"],["autre","Autre"]];
+function items(l){const nz=l.nzl, rk=l.risk, w=l.win, n=l.net, I=[];
+ I.push(["bruit","Bruit",nz?`Prévu : ${nz[0]} dB${nz[1]?", route la plus audible : "+nz[1]:""}. Mesurer au milieu du terrain.`:"Mesurer au milieu du terrain."]);
+ I.push(["maison","Emplacement de la maison","Le coin le plus plat, près du chemin, avec le soleil du sud."]);
+ if(rk&&rk[0]) I.push(["pente","Pentes",`${rk[0][1]} % du lot à plus de 30 % de pente : marcher jusqu’au fond.`]);
+ I.push(["entree","Entrée de garage",w&&w[7]?`Estimée à ${w[4]} % de pente moyenne : imaginer l’hiver.`:"Par où passerait l’entrée, et à quelle pente?"]);
+ I.push(["roc","Roc et sol",rk&&rk[3]>=0&&rk[3]<=1?"La carte indique du roc près de la surface : roc visible?":"Roc visible, sol sablonneux ou mouillé?"]);
+ if(rk&&rk[1]&&(rk[1][0]>0||rk[1][1])) I.push(["humide","Milieu humide","Indiqué tout près : eau stagnante, mousses, quenouilles?"]);
+ I.push(["voisins","Voisins","Maisons visibles? Distance, chiens, chantier?"]);
+ I.push(["soleil","Soleil","Le sud est-il dégagé? Arbres et montagnes au sud."]);
+ I.push(["chemin","Chemin","État, déneigement, pancarte de chemin privé ou d’association?"]);
+ I.push(["bornes","Bornes et limites","Bornes d’arpentage ou rubans?"]);
+ if(n) I.push(["internet","Internet",`Les données disent ${n[0].length?"fibre "+n[0].join(", "):n[1].length?"câble "+n[1].join(", "):"pas de fil"} : poteaux ou boîtiers visibles?`]);
+ return I;}
+// ---------- liste ----------
+function list(){ if(cur) return; $("#ttl").innerHTML=`Scout visite<small>${LOTS.length} terrains · Projet Scout</small>`; $("#back").hidden=true;
+ const L=LOTS.map(l=>({l,d:pos?dist(pos.lat,pos.lng,l.lat,l.lng):null})).sort((a,b)=>a.d==null?a.l.no-b.l.no:a.d-b.d);
+ M.innerHTML=`<div class="card"><p class="fine">${pos?"Triés du plus proche au plus loin de vous.":"Autorisez la localisation pour trier les terrains par distance."} Tout fonctionne sans réseau une fois l’appli ouverte.</p>${pos?"":`<button class="btn main" id="geo">Activer la localisation</button>`}</div>
+ <div class="list">${L.map(({l,d})=>`<button class="lot" data-open="${esc(l.id)}"><span class="no">T${l.no}</span><span><b>${esc(l.n)}</b><small>${esc(l.ad||"")}</small> <span class="tag" data-done="${esc(l.id)}"></span></span><span class="dist">${d==null?"":d<1000?Math.round(d)+" m":(d/1000).toFixed(d<10000?1:0).replace(".",",")+" km"}</span></button>`).join("")}</div>`;
+ const g=$("#geo"); if(g) g.onclick=()=>{startGeo();};
+ L.forEach(async({l})=>{const v=await getV(l.id); const e=M.querySelector(`[data-done="${CSS.escape(l.id)}"]`); if(e&&v&&v.date) e.textContent="Visité le "+v.date+(v.sent?" · envoyé":"");});
+ st("Prêt. Choisissez un terrain.");}
+// ---------- visite ----------
+async function open(id){const l=LOTS.find(x=>x.id===id); if(!l) return list(); cur=l; V=(await getV(id))||{lot:id,v:1}; history.replaceState(null,"","#"+id);
+ $("#back").hidden=false; $("#ttl").innerHTML=`T${l.no} · ${esc(l.n)}<small>${esc(l.ad||"")}</small>`; render(); startGeo(); window.scrollTo(0,0);}
+function stamp(){if(!V.date) V.date=new Date().toLocaleDateString("fr-CA",{day:"numeric",month:"short",year:"numeric"});}
+let saveT=null; function save(){stamp(); V.updatedAt=new Date().toISOString(); V.sent=false; clearTimeout(saveT); saveT=setTimeout(()=>putV(V).then(()=>st("Enregistré sur ce téléphone · "+new Date().toLocaleTimeString("fr-CA",{hour:"2-digit",minute:"2-digit"}))),300);}
+async function render(){const l=cur, ck=V.ck||{}, ph=await allPh(l.id);
+ M.innerHTML=`<div class="card"><div class="map" id="map"><img src="${esc(l.img)}" alt="Vue aérienne du terrain"><svg viewBox="0 0 1000 1000" id="svg"></svg></div>
+ <div class="where" id="where">Recherche de la position…</div>
+ <div class="row"><button class="btn${trace?" main":""}" id="trc">${trace?"■ Arrêter le tracé":"● Tracer ma marche"}</button><button class="btn" id="mk">+ Marquer ici</button></div>
+ ${(V.marks||[]).length?`<div class="marks">${V.marks.map((m,i)=>`<div><span>${i+1}. ${esc((MK.find(k=>k[0]===m.k)||["","Repère"])[1])}${m.note?" · "+esc(m.note):""}</span><button class="btn" style="min-height:32px;padding:0 10px" data-delmk="${i}">✕</button></div>`).join("")}</div>`:""}
+ <p class="fine">${l.approx?"Contour approximatif (cercle de la superficie annoncée) : demandez le plan du lot au promoteur.":"Contour du cadastre du Québec."} Photo aérienne : gouvernement du Québec.</p>
+ <div class="row"><a class="btn" href="https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lng}" target="_blank" rel="noopener">Itinéraire</a></div></div>
+ <div class="card"><h2>Bruit</h2><div class="meter"><div><b id="lnow">–</b><span>maintenant</span></div><div><b id="leq">${V.db??"–"}</b><span>moyenne (LAeq)</span></div><div><b id="lmax">–</b><span>maximum</span></div></div><div class="bar"><i id="lbar"></i></div>
+ <div class="row"><button class="btn main" id="snd">${meter?"■ Arrêter":"▶ Mesurer 1 minute"}</button><button class="btn" id="cal">${CAL?"Étalonné":"Étalonner"}</button></div>
+ <p class="fine">${CAL?"Étalonné avec une appli de sonomètre : précision d’environ ±3 à 5 dB.":"Pas encore étalonné : les chiffres servent à comparer les terrains entre eux. Étalonnez une fois avec NIOSH SLM pour des dB fiables."} Tenez le téléphone à bout de bras, sans parler.</p>
+ ${(V.mes||[]).length?`<div class="marks">${V.mes.map(m=>`<div><span>${esc(m.h)} · ${m.s} s</span><b>${m.leq} dB (max ${m.max})</b></div>`).join("")}</div>`:""}
+ <div class="chips">${HEAR.map(h=>`<button data-hear="${esc(h)}" aria-pressed="${(V.hear||[]).includes(h)}">${esc(h)}</button>`).join("")}</div></div>
+ <div class="card"><h2>Photos</h2><div class="ph">${ph.map(p=>`<figure><img src="${p.img}" alt="Photo de visite"><button data-delph="${p.k}" aria-label="Retirer">✕</button><figcaption>${typeof p.lat==="number"?esc(rel(l,p)):"sans position"}</figcaption></figure>`).join("")}</div><label class="add">+ Prendre des photos<input type="file" accept="image/*" capture="environment" multiple id="phf"></label></div>
+ <div class="card"><h2>À vérifier</h2><div>${items(l).map(([k,t,h])=>`<div class="it"><p>${esc(t)}<small>${esc(h)}</small></p><div class="tri">${[["ok","✓"],["w","!"],["x","✕"]].map(([v,s])=>`<button data-ck="${k}" data-v="${v}" aria-pressed="${ck[k]===v}">${s}</button>`).join("")}</div></div>`).join("")}</div></div>
+ <div class="card"><h2>Signal cellulaire</h2><div class="sig">${CARR.map(c=>`<span>${c}</span><div class="bars">${[0,1,2,3,4].map(b=>`<button data-sig="${c}" data-v="${b}" aria-pressed="${(V.sig||{})[c]===b}">${b}</button>`).join("")}</div>`).join("")}</div><p class="fine">Les barres de votre téléphone, au fond du terrain. Faire un appel test.</p></div>
+ <div class="card"><h2>Notes</h2><textarea id="notes" placeholder="Impressions, questions pour le vendeur ou la Ville…">${esc(V.notes||"")}</textarea></div>
+ <div class="card"><h2>Fin de la visite</h2><button class="btn main" id="send">Envoyer à Projet Scout</button><p class="fine">Crée un fichier de la visite (avec les photos). Enregistrez-le dans Fichiers, puis dans Projet Scout : Mode visite › Importer une visite.</p><a class="btn" href="${PS}#visite-${esc(l.id).replace(/[^\w-]/g,"")}" target="_blank" rel="noopener">Ouvrir la fiche dans Projet Scout</a></div>`;
+ $("#notes").oninput=e=>{V.notes=e.target.value; save();};
+ $("#phf").onchange=e=>{addPh(e.target.files); e.target.value="";};
+ $("#trc").onclick=()=>{trace=!trace; if(trace) startGeo(); render();};
+ $("#mk").onclick=markHere; $("#snd").onclick=()=>meter?stopMeter():startMeter(); $("#cal").onclick=calibrate; $("#send").onclick=send;
+ drawMap();}
+function rel(l,p){const d=dist(l.lat,l.lng,p.lat,p.lng); return d<15?"au centre du lot":`à ${Math.round(d)} m au ${dirTo(l.lat,l.lng,p.lat,p.lng)} du centre`;}
+function drawMap(){const s=$("#svg"); if(!s||!cur) return; const l=cur, P=l.poly.map(([a,b])=>px(l,a,b).map(v=>v.toFixed(1)).join(",")).join(" ");
+ let h=`<polygon points="${P}" fill="rgba(255,214,0,.12)" stroke="#FFD600" stroke-width="4" stroke-dasharray="${l.approx?"14 10":"none"}"/>`;
+ if((V.trace||[]).length>1) h+=`<polyline points="${V.trace.map(([a,b])=>px(l,a,b).join(",")).join(" ")}" fill="none" stroke="#ff4fa3" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
+ (V.marks||[]).forEach((m,i)=>{const [x,y]=px(l,m.lat,m.lng); h+=`<g><circle cx="${x}" cy="${y}" r="20" fill="#fff" stroke="#24543F" stroke-width="5"/><text x="${x}" y="${y+8}" text-anchor="middle" font-size="24" font-weight="800" fill="#24543F">${i+1}</text></g>`;});
+ const W=$("#where");
+ if(pos&&Date.now()-pos.t<60000){const [x,y]=px(l,pos.lat,pos.lng); const mpp=(l.bb[2]-l.bb[0])/1000/ (1/Math.cos(pos.lat*Math.PI/180)); const r=Math.max(6,pos.acc/mpp);
+  if(x>-50&&x<1050&&y>-50&&y<1050) h+=`<circle cx="${x}" cy="${y}" r="${r}" fill="rgba(30,107,184,.18)" stroke="rgba(30,107,184,.5)"/><circle cx="${x}" cy="${y}" r="13" fill="#1E6BB8" stroke="#fff" stroke-width="5"/>`;
+  const inn=inside(pos.lat,pos.lng,l.poly), d=dist(pos.lat,pos.lng,l.lat,l.lng);
+  W.className="where "+(inn?"in":"out"); W.textContent=inn?`Vous êtes sur le terrain (précision ±${Math.round(pos.acc)} m)`:`Hors du terrain : centre à ${d<1000?Math.round(d)+" m":(d/1000).toFixed(1).replace(".",",")+" km"} vers le ${dirTo(pos.lat,pos.lng,l.lat,l.lng)} (±${Math.round(pos.acc)} m)`;}
+ else W.textContent=navigator.geolocation?"Recherche de la position… (autorisez la localisation)":"GPS non disponible sur cet appareil.";
+ s.innerHTML=h;}
+function dlg(html,init){const d=$("#dlg"); d.innerHTML=html; d.showModal(); init&&init(d); return d;}
+function markHere(){ if(!pos){st("Pas encore de position GPS."); return;}
+ dlg(`<h2 style="margin:0 0 10px">Marquer ici</h2><div class="chips" style="margin-bottom:10px">${MK.map(([k,t],i)=>`<button data-k="${k}" aria-pressed="${i===0}">${t}</button>`).join("")}</div><input type="text" id="mkn" placeholder="Note (facultatif)"><div class="row" style="margin-top:12px"><button class="btn" id="mkc">Annuler</button><button class="btn main" id="mko">Ajouter</button></div>`,d=>{
+  let k=MK[0][0]; d.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{k=b.dataset.k; d.querySelectorAll("[data-k]").forEach(x=>x.setAttribute("aria-pressed",x===b));});
+  d.querySelector("#mkc").onclick=()=>d.close(); d.querySelector("#mko").onclick=()=>{(V.marks||(V.marks=[])).push({k,note:d.querySelector("#mkn").value.trim(),lat:+pos.lat.toFixed(6),lng:+pos.lng.toFixed(6),acc:Math.round(pos.acc)}); save(); d.close(); render();};});}
+// ---------- sonomètre (pondération A appliquée au spectre) ----------
+const Aw=f=>{const f2=f*f; const ra=(12194**2*f2*f2)/((f2+20.6**2)*Math.sqrt((f2+107.7**2)*(f2+737.9**2))*(f2+12194**2)); return ra*ra*10**(2.0/10);};
+async function startMeter(){try{
+ const s=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+ const ac=new (window.AudioContext||window.webkitAudioContext)(); await ac.resume(); const src=ac.createMediaStreamSource(s), an=ac.createAnalyser(); an.fftSize=8192; an.smoothingTimeConstant=0; src.connect(an);
+ const N=an.frequencyBinCount, w=new Float32Array(N), buf=new Float32Array(N); for(let i=1;i<N;i++){const f=i*ac.sampleRate/an.fftSize; w[i]=f<20?0:Aw(f);}
+ meter={s,ac,an,sum:0,n:0,max:-1e9,t0:Date.now()}; render();
+ const off=CAL?CAL.off:100;
+ meter.iv=setInterval(()=>{an.getFloatFrequencyData(buf); let p=0; for(let i=1;i<N;i++) p+=w[i]*10**(buf[i]/10); const raw=10*Math.log10(p+1e-20), L=raw+off; meter.sum+=10**(raw/10); meter.n++; meter.max=Math.max(meter.max,L); meter.raw=raw;
+  const leq=10*Math.log10(meter.sum/meter.n)+off; const e=$("#lnow"); const fm=v=>v<15?"<15":Math.round(v); if(e){e.textContent=fm(L); $("#leq").textContent=fm(leq); $("#lmax").textContent=fm(meter.max); $("#lbar").style.width=Math.min(100,Math.max(0,(L-20)/70*100))+"%";}
+  const sec=(Date.now()-meter.t0)/1000; st(`Mesure en cours : ${Math.round(sec)} s sur 60`); if(sec>=60) stopMeter();},125);
+}catch(e){st("Micro refusé : autorisez le micro pour Safari (Réglages › Safari › Micro).");}}
+function stopMeter(keep=true){if(!meter) return; clearInterval(meter.iv); meter.s.getTracks().forEach(t=>t.stop()); meter.ac.close();
+ const off=CAL?CAL.off:100, sec=Math.round((Date.now()-meter.t0)/1000);
+ if(keep&&meter.n>40){const leq=Math.round(10*Math.log10(meter.sum/meter.n)+off), mx=Math.round(meter.max); (V.mes||(V.mes=[])).push({leq,max:mx,s:sec,h:new Date().toLocaleTimeString("fr-CA",{hour:"2-digit",minute:"2-digit"}),cal:!!CAL,...(pos?{lat:+pos.lat.toFixed(6),lng:+pos.lng.toFixed(6)}:{})}); V.db=Math.round(V.mes.reduce((a,m)=>a+m.leq,0)/V.mes.length); save();}
+ meter=null; st(keep?"Mesure enregistrée.":"Mesure arrêtée."); render();}
+function calibrate(){dlg(`<h2 style="margin:0 0 8px">Étalonner le micro</h2><p class="fine" style="margin-bottom:10px">1. Ouvrez NIOSH SLM (ou une autre appli de sonomètre) sur l’autre téléphone, ou juste avant.<br>2. Dans un endroit calme et constant, lancez la mesure ici ET dans l’appli, au même endroit, 30 secondes.<br>3. Entrez la moyenne (LAeq) affichée par l’appli.</p><button class="btn main" id="cgo" style="width:100%">▶ Mesurer 30 s ici</button><p id="cst" class="fine" style="margin:8px 0"></p><input type="number" inputmode="decimal" id="cval" placeholder="LAeq de l’appli, en dB"><div class="row" style="margin-top:12px"><button class="btn" id="cx">Annuler</button>${CAL?`<button class="btn" id="cr">Effacer</button>`:""}<button class="btn main" id="cok">Enregistrer</button></div>`,async d=>{
+  let raw=null; d.querySelector("#cx").onclick=()=>d.close(); const cr=d.querySelector("#cr"); if(cr) cr.onclick=()=>{CAL=null; localStorage.removeItem("sv-cal"); d.close(); render();};
+  d.querySelector("#cgo").onclick=async()=>{const S=d.querySelector("#cst"); await startMeter(); if(!meter) return; S.textContent="Mesure…"; setTimeout(()=>{raw=10*Math.log10(meter.sum/meter.n); S.textContent="Mesure terminée."; stopMeter(false);},30000);};
+  d.querySelector("#cok").onclick=()=>{const v=parseFloat(d.querySelector("#cval").value.replace(",",".")); if(raw==null||!isFinite(v)){d.querySelector("#cst").textContent="Faites d’abord la mesure de 30 s, puis entrez la valeur."; return;} CAL={off:v-raw,at:new Date().toISOString()}; localStorage.setItem("sv-cal",JSON.stringify(CAL)); d.close(); render();};});}
+// ---------- photos ----------
+function shrink(file,max,q){return new Promise((res,rej)=>{const u=URL.createObjectURL(file); const im=new Image(); im.onload=()=>{const k=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight)); const c=document.createElement("canvas"); c.width=Math.round(im.naturalWidth*k); c.height=Math.round(im.naturalHeight*k); c.getContext("2d").drawImage(im,0,0,c.width,c.height); URL.revokeObjectURL(u); res(c.toDataURL("image/jpeg",q));}; im.onerror=()=>{URL.revokeObjectURL(u); rej();}; im.src=u;});}
+async function addPh(files){let n=0; for(const f of files){if(!/^image\//.test(f.type)) continue; try{let img=await shrink(f,1100,.78); if(img.length>600000) img=await shrink(f,850,.7);
+ const p={lot:cur.id,img,at:new Date().toISOString(),...(pos&&Date.now()-pos.t<60000?{lat:+pos.lat.toFixed(6),lng:+pos.lng.toFixed(6)}:{})}; await putPh("p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),p); n++;}catch(e){}}
+ save(); render(); st(`${n} photo${n>1?"s":""} ajoutée${n>1?"s":""}`);}
+// ---------- envoi ----------
+async function send(){const ph=await allPh(cur.id); const data={app:"scout-visite",v:1,lot:cur.id,lotName:cur.n,exportedAt:new Date().toISOString(),visit:{...V},photos:ph.map(({k,...p})=>p)};
+ const name=`scout-visite-${cur.id}-${new Date().toISOString().slice(0,10)}.json`; const file=new File([JSON.stringify(data)],name,{type:"application/json"});
+ try{ if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Visite "+cur.n}); V.sent=true; await putV(V); st("Fichier partagé. Importez-le dans Projet Scout."); return;} }catch(e){if(e&&e.name==="AbortError") return;}
+ const a=document.createElement("a"); a.href=URL.createObjectURL(file); a.download=name; document.body.appendChild(a); a.click(); a.remove(); V.sent=true; await putV(V); st("Fichier téléchargé. Importez-le dans Projet Scout.");}
+// ---------- événements ----------
+M.addEventListener("click",async e=>{const t=e.target;
+ const o=t.closest("[data-open]"); if(o){open(o.dataset.open); return;}
+ const c=t.closest("[data-ck]"); if(c){V.ck=V.ck||{}; V.ck[c.dataset.ck]=V.ck[c.dataset.ck]===c.dataset.v?null:c.dataset.v; save(); c.parentNode.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",V.ck[c.dataset.ck]===b.dataset.v)); return;}
+ const s=t.closest("[data-sig]"); if(s){V.sig=V.sig||{}; const v=+s.dataset.v; V.sig[s.dataset.sig]=V.sig[s.dataset.sig]===v?null:v; save(); s.parentNode.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",V.sig[s.dataset.sig]===+b.dataset.v)); return;}
+ const h=t.closest("[data-hear]"); if(h){const a=new Set(V.hear||[]); a.has(h.dataset.hear)?a.delete(h.dataset.hear):a.add(h.dataset.hear); V.hear=[...a]; save(); h.setAttribute("aria-pressed",a.has(h.dataset.hear)); return;}
+ const dm=t.closest("[data-delmk]"); if(dm){V.marks.splice(+dm.dataset.delmk,1); save(); render(); return;}
+ const dp=t.closest("[data-delph]"); if(dp){if(dp.dataset.sure!=="1"){dp.dataset.sure="1"; dp.textContent="?"; setTimeout(()=>{dp.dataset.sure=""; dp.textContent="✕";},3000); return;} await delPh(dp.dataset.delph); render();}});
+$("#back").onclick=()=>{if(meter) stopMeter(); cur=null; V=null; trace=false; history.replaceState(null,"",location.pathname); list(); window.scrollTo(0,0);};
+window.addEventListener("hashchange",()=>{const id=decodeURIComponent(location.hash.slice(1)); if(id&&(!cur||cur.id!==id)) open(id);});
+fetch("data/lots.json").then(r=>r.json()).then(d=>{LOTS=d; const id=decodeURIComponent(location.hash.slice(1)); id&&LOTS.some(l=>l.id===id)?open(id):list();
+ if(navigator.permissions) navigator.permissions.query({name:"geolocation"}).then(p=>{if(p.state==="granted") startGeo();}).catch(()=>{});}).catch(()=>st("Impossible de charger les terrains."));
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+</script>
+</body>
+</html>
