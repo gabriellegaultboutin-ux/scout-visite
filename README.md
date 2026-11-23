@@ -1,0 +1,2 @@
+# scout-visite
+Projet Scout
